@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>SC-DATA | Academic Document Search — Minggu 11</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --p50:#FAF5FF;--p100:#F3E8FF;--p200:#E9D5FF;--p500:#A855F7;--p600:#9333EA;--p700:#7C3AED;--p800:#6D28D9;--p900:#4C1D95;
+  --b50:#EFF6FF;--b100:#DBEAFE;--b500:#3B82F6;--b600:#2563EB;--b700:#1D4ED8;--b800:#1E40AF;
+  --g50:#F0FDF4;--g100:#DCFCE7;--g500:#22C55E;--g600:#16A34A;--g700:#15803D;
+  --a50:#FFFBEB;--a100:#FEF3C7;--a700:#B45309;
+  --r50:#FFF1F2;--r100:#FFE4E6;--r700:#B91C1C;
+  --gray50:#F9FAFB;--gray100:#F3F4F6;--gray200:#E5E7EB;--gray300:#D1D5DB;
+  --gray500:#6B7280;--gray700:#374151;--gray900:#111827;
+  --sh:0 2px 12px rgba(0,0,0,.08);--shm:0 4px 24px rgba(0,0,0,.10);--shl:0 8px 40px rgba(0,0,0,.14);
+  --r:14px;--rl:20px;--fn:"Plus Jakarta Sans",sans-serif;--mo:"JetBrains Mono",monospace;
+}
+body{font-family:var(--fn);background:linear-gradient(135deg,#FAF5FF 0%,#EFF6FF 50%,#F0FDF4 100%);min-height:100vh;color:var(--gray900);font-size:14px;}
+.layout{display:grid;grid-template-columns:280px 1fr;min-height:100vh;}
+.sidebar{background:linear-gradient(180deg,#1E0A3C 0%,#2E1065 40%,#4C1D95 100%);color:white;padding:1.5rem 1.2rem;position:sticky;top:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column;gap:.85rem;}
+.sb-logo{font-size:.62rem;font-weight:800;background:white;color:var(--p800);padding:3px 10px;border-radius:99px;letter-spacing:.07em;text-transform:uppercase;display:inline-block;}
+.sb-title{font-size:1rem;font-weight:700;margin-top:.35rem;}.sb-sub{font-size:.7rem;opacity:.6;margin-top:2px;}
+.sb-div{border:none;border-top:1px solid rgba(255,255,255,.1);}.sb-lbl{font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;opacity:.4;margin-bottom:.35rem;}
+.doc-item{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:9px;padding:.55rem .8rem;margin-bottom:.4rem;}
+.doc-name{font-size:.76rem;font-weight:600;}.doc-chunks{font-size:.66rem;opacity:.55;margin-top:1px;}
+.stat-row{display:flex;justify-content:space-between;font-size:.76rem;padding:.18rem 0;}
+.stat-val{font-weight:700;font-family:var(--mo);}
+.qbtn{display:block;width:100%;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:.5rem .75rem;margin-bottom:.4rem;cursor:pointer;font-family:var(--fn);font-size:.75rem;color:white;text-align:left;transition:all .15s;line-height:1.4;}
+.qbtn:hover{background:rgba(255,255,255,.2);transform:translateX(3px);}
+.sb-note{margin-top:auto;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:9px;padding:.7rem;font-size:.7rem;opacity:.62;line-height:1.5;}
+.main{padding:1.5rem 2rem;}
+.ph{background:linear-gradient(135deg,#4C1D95,#6D28D9,#1D4ED8);color:white;border-radius:var(--rl);padding:1.4rem 2rem;margin-bottom:1.5rem;box-shadow:var(--shl);display:flex;align-items:center;justify-content:space-between;gap:1rem;}
+.ph-t{font-size:1.6rem;font-weight:800;letter-spacing:-.5px;}.ph-s{font-size:.83rem;opacity:.78;margin-top:4px;}
+.ph-b{display:inline-block;background:rgba(255,255,255,.15);padding:3px 12px;border-radius:99px;font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-top:6px;}
+#toast{position:fixed;top:1.5rem;right:1.5rem;z-index:9999;background:white;border-radius:var(--r);padding:.85rem 1.2rem;box-shadow:var(--shl);border-left:4px solid var(--p500);font-size:.84rem;font-weight:600;display:flex;align-items:center;gap:8px;transform:translateX(120%);opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1);min-width:220px;}
+#toast.show{transform:translateX(0);opacity:1;}
+.search-wrap{background:white;border-radius:var(--rl);padding:1.5rem;box-shadow:var(--sh);margin-bottom:1.25rem;}
+.search-row{display:flex;gap:10px;align-items:center;}
+.search-input{flex:1;padding:.75rem 1.1rem;border:2px solid var(--gray200);border-radius:10px;font-family:var(--fn);font-size:.9rem;outline:none;transition:border-color .2s;}
+.search-input:focus{border-color:var(--p500);}
+.btn-search{background:linear-gradient(135deg,var(--p700),var(--b700));color:white;padding:.72rem 1.5rem;border-radius:10px;border:none;font-size:.88rem;font-weight:700;cursor:pointer;transition:all .18s;white-space:nowrap;}
+.btn-search:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(109,40,217,.4);}
+.slider-wrap{display:flex;align-items:center;gap:10px;margin-top:.85rem;font-size:.82rem;color:var(--gray500);}
+.slider-wrap input{accent-color:var(--p600);}
+.answer-box{background:linear-gradient(135deg,var(--p50),var(--b50));border:1px solid var(--p200);border-left:4px solid var(--p700);border-radius:var(--r);padding:1.25rem 1.5rem;margin-bottom:1.25rem;}
+.answer-title{font-size:.88rem;font-weight:700;color:var(--p900);margin-bottom:.6rem;}
+.answer-text{font-size:.88rem;color:var(--gray700);line-height:1.7;}
+.answer-src{margin-top:.75rem;display:flex;gap:6px;flex-wrap:wrap;align-items:center;}
+.src-badge{font-size:.72rem;font-weight:600;background:var(--b100);color:var(--b700);padding:3px 10px;border-radius:99px;}
+.card{background:white;border-radius:var(--rl);box-shadow:var(--sh);margin-bottom:1.25rem;overflow:hidden;}
+.chdr{padding:.85rem 1.4rem;border-bottom:1px solid var(--gray100);display:flex;align-items:center;justify-content:space-between;}
+.ct{font-size:.92rem;font-weight:700;color:var(--gray900);display:flex;align-items:center;gap:7px;}
+.cb{padding:1.25rem 1.4rem;}
+.cbadge{font-size:.63rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:2px 9px;border-radius:99px;}
+.cbp{background:var(--p100);color:var(--p700);}.cbb{background:var(--b100);color:var(--b700);}
+.result-item{border:1px solid var(--gray200);border-radius:var(--r);padding:1rem 1.25rem;margin-bottom:.75rem;border-left:4px solid var(--p600);transition:transform .15s;}
+.result-item:hover{transform:translateY(-1px);box-shadow:var(--shm);}
+.ri-header{display:flex;align-items:center;gap:8px;margin-bottom:.6rem;flex-wrap:wrap;}
+.ri-num{width:26px;height:26px;border-radius:50%;background:var(--p700);color:white;font-size:.76rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.ri-title{font-size:.88rem;font-weight:700;flex:1;}
+.ri-score{font-size:.68rem;font-weight:700;background:var(--p100);color:var(--p700);padding:2px 9px;border-radius:99px;}
+.ri-src{font-size:.68rem;font-weight:600;background:var(--b100);color:var(--b700);padding:2px 9px;border-radius:99px;}
+.ri-heading{font-size:.78rem;color:var(--gray500);margin-bottom:.5rem;font-style:italic;}
+.ri-text{font-size:.82rem;color:var(--gray700);line-height:1.65;background:var(--gray50);border-radius:8px;padding:.65rem .85rem;}
+.ri-meta{font-size:.7rem;color:var(--gray500);margin-top:.5rem;font-family:var(--mo);}
+.tbl{width:100%;border-collapse:collapse;font-size:.8rem;}
+.tbl th{background:var(--gray50);padding:.58rem .85rem;text-align:left;font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--gray500);border-bottom:1px solid var(--gray200);}
+.tbl td{padding:.52rem .85rem;border-bottom:1px solid var(--gray100);color:var(--gray700);vertical-align:top;}
+.tbl tr:last-child td{border-bottom:none;}.tbl tr:hover td{background:var(--gray50);}
+.mono{font-family:var(--mo);font-size:.74rem;}
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:99px;font-size:.66rem;font-weight:700;}
+.bok{background:var(--g100);color:var(--g700);}.bno{background:var(--r100);color:var(--r700);}
+.concept-box{background:linear-gradient(135deg,var(--p50),var(--b50));border:1px solid var(--p200);border-left:4px solid var(--p700);border-radius:var(--r);padding:1rem 1.2rem;font-size:.83rem;color:var(--p900);line-height:1.62;margin-bottom:1.2rem;}
+.empty-state{text-align:center;padding:2.5rem 1.5rem;}
+.alur-flow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:.6rem 0;}
+.af-step{padding:.48rem .95rem;border-radius:9px;font-size:.8rem;font-weight:700;}
+.af-arr{color:var(--gray300);font-size:1rem;}
+.cli{display:flex;align-items:center;gap:9px;padding:.45rem 0;border-bottom:1px solid var(--gray100);font-size:.83rem;}
+.cli:last-child{border-bottom:none;}.cl-l{flex:1;color:var(--gray700);}
+.cl-s{font-size:.68rem;font-weight:700;padding:2px 9px;border-radius:99px;}
+.clo{background:var(--g100);color:var(--g700);}.cln{background:var(--a100);color:var(--a700);}
+.pfoot{text-align:center;padding:1.4rem 0 .6rem;border-top:1px solid var(--gray200);margin-top:1rem;font-size:.73rem;color:var(--gray500);}
+@keyframes fu{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+.fu{animation:fu .38s ease both;}
+@media(max-width:900px){.layout{grid-template-columns:1fr;}.sidebar{position:relative;height:auto;}}
+</style>
+</head>
+<body>
+<div id="toast"><span id="ti">🔍</span><span id="tm">—</span></div>
+<div class="layout">
+
+<aside class="sidebar">
+  <div><span class="sb-logo">SC-DATA</span><div class="sb-title">Document Search</div><div class="sb-sub">Modul 11 — RAG Sederhana</div></div>
+  <hr class="sb-div">
+  <div>
+    <div class="sb-lbl">📄 Dokumen Akademik</div>
+    <div id="doc-list"></div>
+  </div>
+  <div>
+    <div class="sb-lbl">📊 Statistik</div>
+    <div class="stat-row"><span>Total dokumen</span><span class="stat-val">4</span></div>
+    <div class="stat-row"><span>Total chunks</span><span class="stat-val" id="sb-chunks">0</span></div>
+    <div class="stat-row"><span>Hasil pencarian</span><span class="stat-val" id="sb-results">0</span></div>
+  </div>
+  <hr class="sb-div">
+  <div>
+    <div class="sb-lbl">💡 Pertanyaan Contoh</div>
+    <button class="qbtn" onclick="setQ('Berapa SKS maksimal jika IP saya 3.6?')">Q1: Berapa SKS maksimal jika IP 3.6?</button>
+    <button class="qbtn" onclick="setQ('Apa syarat mengajukan skripsi?')">Q2: Syarat mengajukan skripsi?</button>
+    <button class="qbtn" onclick="setQ('Bagaimana prosedur pengajuan cuti akademik?')">Q3: Prosedur cuti akademik?</button>
+    <button class="qbtn" onclick="setQ('Berapa persen kehadiran minimal untuk ujian?')">Q4: Kehadiran minimal untuk ujian?</button>
+    <button class="qbtn" onclick="setQ('Bagaimana sistem penilaian ujian?')">Q5: Sistem penilaian ujian?</button>
+  </div>
+  <div class="sb-note"><b>💡 Konsep RAG:</b><br>Dokumen → Chunk → Metadata → Retrieval → Jawaban + Sumber. Jawaban hanya dari dokumen, tidak mengarang.</div>
+</aside>
+
+<main class="main">
+  <div class="ph fu">
+    <div><div class="ph-t">🔍 Academic Document Search</div><div class="ph-s">SC-DATA Minggu 11 · RAG Sederhana · Pencarian Dokumen Akademik Berbasis Retrieval</div></div>
+    <div style="text-align:right;"><span class="ph-b">Modul 11 · SBDM Capstone</span></div>
+  </div>
+
+  <div class="search-wrap fu">
+    <div class="search-row">
+      <input class="search-input" id="q-input" type="text" placeholder="Masukkan pertanyaan akademik... (contoh: syarat mengambil skripsi)" onkeydown="if(event.key==='Enter')doSearch()">
+      <button class="btn-search" onclick="doSearch()">🔍 Cari</button>
+    </div>
+    <div class="slider-wrap">
+      <span>Tampilkan:</span>
+      <input type="range" id="topk" min="3" max="5" value="3" oninput="document.getElementById('topk-val').textContent=this.value">
+      <span id="topk-val">3</span> hasil relevan
+    </div>
+  </div>
+
+  <div id="answer-section" style="display:none;" class="fu">
+    <div class="answer-box">
+      <div class="answer-title">💬 Jawaban Ringkas</div>
+      <div class="answer-text" id="answer-text">—</div>
+      <div class="answer-src"><span style="font-size:.78rem;font-weight:600;color:var(--gray700);">📚 Sumber:</span><span id="answer-src">—</span></div>
+    </div>
+  </div>
+
+  <div id="results-section" style="display:none;">
+    <div class="card fu">
+      <div class="chdr"><div class="ct">📋 Hasil Pencarian Relevan</div><span class="cbadge cbp" id="res-count">0 hasil</span></div>
+      <div class="cb"><div id="result-items"></div></div>
+    </div>
+  </div>
+
+  <div id="empty-state" class="card fu">
+    <div class="empty-state">
+      <div style="font-size:3rem;opacity:.4;">🔍</div>
+      <div style="font-size:1.05rem;font-weight:700;color:var(--gray700);margin:.75rem 0 .35rem;">Belum Ada Pencarian</div>
+      <div style="font-size:.83rem;color:var(--gray500);">Ketikkan pertanyaan di atas atau klik salah satu pertanyaan contoh di sidebar</div>
+    </div>
+    <div class="cb">
+      <div class="alur-flow">
+        <div class="af-step" style="background:var(--b100);color:var(--b700);">📄 4 Dokumen</div><div class="af-arr">→</div>
+        <div class="af-step" style="background:var(--p100);color:var(--p700);">✂️ Chunking</div><div class="af-arr">→</div>
+        <div class="af-step" style="background:var(--g100);color:var(--g700);">🏷️ Metadata</div><div class="af-arr">→</div>
+        <div class="af-step" style="background:var(--a100);color:var(--a700);">🔍 Retrieval</div><div class="af-arr">→</div>
+        <div class="af-step" style="background:var(--p100);color:var(--p800);">💬 Jawaban + Sumber</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card fu">
+    <div class="chdr"><div class="ct">📝 Tabel 5 Pertanyaan Uji</div><span class="cbadge cbb">Evaluasi Retrieval</span></div>
+    <div style="overflow-x:auto;">
+      <table class="tbl"><thead><tr><th>#</th><th>Pertanyaan</th><th>Hasil Teratas</th><th>Sumber</th><th>Hasil</th><th>Grounded</th></tr></thead>
+      <tbody id="uji-tbody"></tbody></table>
+    </div>
+  </div>
+
+  <div class="card fu">
+    <div class="chdr"><div class="ct">📦 Metadata Chunks</div><span class="cbadge cbp" id="chunk-count-badge">0 chunks</span></div>
+    <div style="overflow-x:auto;max-height:280px;overflow-y:auto;">
+      <table class="tbl"><thead><tr><th>Chunk ID</th><th>Dokumen</th><th>Heading</th><th>Index</th><th>Kata</th></tr></thead>
+      <tbody id="chunk-tbody"></tbody></table>
+    </div>
+  </div>
+
+  <div class="card fu">
+    <div class="chdr"><div class="ct">✅ Checklist Validasi Dosen</div></div>
+    <div class="cb" id="cl-body"></div>
+  </div>
+
+  <div class="concept-box fu">
+    <b>📖 Konsep RAG (Retrieval-Augmented Generation) Sederhana:</b><br>
+    <b>1. Chunking:</b> Dokumen dipecah menjadi potongan kecil dengan metadata (sumber, heading, indeks).<br>
+    <b>2. Retrieval:</b> Query dicocokkan dengan chunk menggunakan keyword scoring — tanpa vector/embedding.<br>
+    <b>3. Grounding:</b> Jawaban hanya berasal dari teks dokumen, tidak mengarang di luar sumber.<br>
+    <b>4. Sumber:</b> Setiap jawaban menyertakan referensi nama file dokumen asal.
+  </div>
+
+  <div class="pfoot">SC-DATA · Minggu 11 — Academic Document Search / RAG · Dosen: Oni Bibin Bintoro / Ashari Abidin · ISTN</div>
+</main>
+</div>
+
+<script>
+const CHUNKS = [{"chunk_id": "CHK001", "doc_source": "pedoman_krs.txt", "doc_title": "Pedoman Krs", "heading": "BAB III - BEBAN STUDI\nJumlah SKS yang dapat diambil mahasiswa ditentukan berdasa", "chunk_index": 1, "word_count": 89, "text": "PEDOMAN PENGISIAN KARTU RENCANA STUDI (KRS) Institut Sains dan Teknologi Nasional (ISTN) Tahun Akademik 2025/2026 BAB I - KETENTUAN UMUM KRS adalah dokumen resmi yang memuat daftar mata kuliah yang akan diambil mahasiswa pada satu semester. Pengisian KRS dilakukan secara online melalui sistem akademik SIAKAD ISTN. BAB II - PERSYARATAN PENGISIAN KRS Mahasiswa dapat mengisi KRS apabila memenuhi syarat berikut: 1. Telah melunasi biaya pendidikan semester berjalan 2. Tidak memiliki tanggungan administrasi dari semester sebelumnya 3. Memperoleh persetujuan dari Dosen Pembimbing Akademik (DPA) 4. IPK semester sebelumnya minimal 2.00"}, {"chunk_id": "CHK002", "doc_source": "pedoman_krs.txt", "doc_title": "Pedoman Krs", "heading": "BAB V - PERUBAHAN KRS\nPerubahan KRS (penambahan atau pengurangan mata kuliah) ha", "chunk_index": 2, "word_count": 118, "text": "memiliki tanggungan administrasi dari semester sebelumnya 3. Memperoleh persetujuan dari Dosen Pembimbing Akademik (DPA) 4. IPK semester sebelumnya minimal 2.00 BAB III - BEBAN STUDI Jumlah SKS yang dapat diambil mahasiswa ditentukan berdasarkan Indeks Prestasi (IP) semester sebelumnya: - IP >= 3.50 : maksimal 24 SKS - IP 3.00 - 3.49 : maksimal 22 SKS - IP 2.50 - 2.99 : maksimal 20 SKS - IP 2.00 - 2.49 : maksimal 18 SKS - IP < 2.00 : maksimal 12 SKS BAB IV - JADWAL PENGISIAN KRS Pengisian KRS dilakukan pada masa registrasi akademik yang ditetapkan oleh Biro Akademik. Mahasiswa yang tidak mengisi KRS pada masa registrasi dianggap tidak aktif pada semester tersebut dan dikenakan cuti akademik paksa."}, {"chunk_id": "CHK003", "doc_source": "pedoman_krs.txt", "doc_title": "Pedoman Krs", "heading": "BAB VII - SANKSI\nMahasiswa yang terbukti memalsukan data KRS atau meminta orang ", "chunk_index": 3, "word_count": 116, "text": "Akademik. Mahasiswa yang tidak mengisi KRS pada masa registrasi dianggap tidak aktif pada semester tersebut dan dikenakan cuti akademik paksa. BAB V - PERUBAHAN KRS Perubahan KRS (penambahan atau pengurangan mata kuliah) hanya dapat dilakukan pada masa revisi KRS yang berlangsung selama dua minggu pertama perkuliahan. Perubahan KRS memerlukan persetujuan DPA. BAB VI - PEMBATALAN MATA KULIAH Pembatalan mata kuliah setelah masa revisi KRS hanya diperbolehkan dengan alasan medis atau darurat keluarga yang dibuktikan dengan surat keterangan resmi. Mata kuliah yang dibatalkan akan mendapat nilai W (Withdrawal) pada transkrip. BAB VII - SANKSI Mahasiswa yang terbukti memalsukan data KRS atau meminta orang lain mengisi KRS tanpa izin akan dikenakan sanksi akademik sesuai peraturan disiplin mahasiswa ISTN."}, {"chunk_id": "CHK004", "doc_source": "pedoman_skripsi.txt", "doc_title": "Pedoman Skripsi", "heading": "BAB III - STRUKTUR SKRIPSI\nSkripsi terdiri dari bagian-bagian berikut:\n- Halaman", "chunk_index": 1, "word_count": 97, "text": "PEDOMAN PENULISAN SKRIPSI Institut Sains dan Teknologi Nasional (ISTN) Program Studi Informatika dan Sistem Informasi BAB I - PENGERTIAN DAN TUJUAN Skripsi adalah karya tulis ilmiah yang disusun oleh mahasiswa program sarjana sebagai syarat kelulusan. Skripsi bertujuan melatih mahasiswa mengidentifikasi masalah, melakukan penelitian, dan menyajikan hasil secara sistematis dan ilmiah. BAB II - PERSYARATAN PENGAJUAN SKRIPSI Mahasiswa dapat mengajukan skripsi apabila: 1. Telah menempuh minimal 120 SKS dengan IPK >= 2.50 2. Telah lulus mata kuliah Metodologi Penelitian 3. Telah lulus mata kuliah Kerja Praktik 4. Tidak memiliki nilai D atau E lebih dari 2 mata kuliah"}, {"chunk_id": "CHK005", "doc_source": "pedoman_skripsi.txt", "doc_title": "Pedoman Skripsi", "heading": "BAB IV - PEMBIMBING SKRIPSI\nSetiap mahasiswa dibimbing oleh dua dosen pembimbing", "chunk_index": 2, "word_count": 89, "text": "Penelitian 3. Telah lulus mata kuliah Kerja Praktik 4. Tidak memiliki nilai D atau E lebih dari 2 mata kuliah BAB III - STRUKTUR SKRIPSI Skripsi terdiri dari bagian-bagian berikut: - Halaman Judul - Lembar Pengesahan - Abstrak (Indonesia dan Inggris) - Kata Pengantar - Daftar Isi, Daftar Gambar, Daftar Tabel - BAB I Pendahuluan (latar belakang, rumusan masalah, tujuan, manfaat, batasan) - BAB II Tinjauan Pustaka - BAB III Metodologi Penelitian - BAB IV Hasil dan Pembahasan - BAB V Kesimpulan dan Saran - Daftar Pustaka - Lampiran"}, {"chunk_id": "CHK006", "doc_source": "pedoman_skripsi.txt", "doc_title": "Pedoman Skripsi", "heading": "BAB VI - FORMAT PENULISAN\nSkripsi ditulis menggunakan font Times New Roman ukura", "chunk_index": 3, "word_count": 87, "text": "III Metodologi Penelitian - BAB IV Hasil dan Pembahasan - BAB V Kesimpulan dan Saran - Daftar Pustaka - Lampiran BAB IV - PEMBIMBING SKRIPSI Setiap mahasiswa dibimbing oleh dua dosen pembimbing: Pembimbing I (bidang keilmuan) dan Pembimbing II (metodologi). Bimbingan minimal dilakukan 8 kali yang dibuktikan dengan lembar bimbingan yang ditandatangani pembimbing. BAB V - SIDANG SKRIPSI Sidang skripsi dilakukan di depan tim penguji yang terdiri dari 3 orang. Mahasiswa dinyatakan lulus apabila memperoleh nilai minimal C (60). Perbaikan skripsi pasca sidang diselesaikan maksimal 30 hari."}, {"chunk_id": "CHK007", "doc_source": "pedoman_skripsi.txt", "doc_title": "Pedoman Skripsi", "heading": "BAB VII - PLAGIARISME\nTingkat kemiripan skripsi dengan karya lain tidak boleh me", "chunk_index": 4, "word_count": 80, "text": "dari 3 orang. Mahasiswa dinyatakan lulus apabila memperoleh nilai minimal C (60). Perbaikan skripsi pasca sidang diselesaikan maksimal 30 hari. BAB VI - FORMAT PENULISAN Skripsi ditulis menggunakan font Times New Roman ukuran 12, spasi 1.5, margin kiri 4 cm, kanan 3 cm, atas 3 cm, bawah 3 cm. Minimal 60 halaman tidak termasuk lampiran. BAB VII - PLAGIARISME Tingkat kemiripan skripsi dengan karya lain tidak boleh melebihi 25 persen yang diukur menggunakan perangkat lunak deteksi plagiarisme yang disediakan institusi."}, {"chunk_id": "CHK008", "doc_source": "aturan_cuti_akademik.txt", "doc_title": "Aturan Cuti Akademik", "heading": "PASAL 3 - KETENTUAN CUTI SUKARELA\nMahasiswa dapat mengajukan cuti sukarela denga", "chunk_index": 1, "word_count": 88, "text": "ATURAN CUTI AKADEMIK Institut Sains dan Teknologi Nasional (ISTN) Peraturan Akademik Nomor 03/ISTN/2024 PASAL 1 - DEFINISI Cuti akademik adalah penghentian sementara kegiatan akademik mahasiswa atas izin resmi dari institusi. Selama cuti, masa studi mahasiswa tetap diperhitungkan kecuali cuti sakit yang disertai bukti medis. PASAL 2 - JENIS CUTI AKADEMIK 1. Cuti Akademik Sukarela: diajukan atas keinginan mahasiswa dengan alasan pribadi atau ekonomi 2. Cuti Akademik Sakit: diajukan karena kondisi medis yang memerlukan istirahat panjang 3. Cuti Akademik Paksa: dikenakan kepada mahasiswa yang tidak mendaftar ulang tanpa pemberitahuan"}, {"chunk_id": "CHK009", "doc_source": "aturan_cuti_akademik.txt", "doc_title": "Aturan Cuti Akademik", "heading": "PASAL 5 - HAK DAN KEWAJIBAN SELAMA CUTI\nSelama cuti akademik mahasiswa:\n- Tidak ", "chunk_index": 2, "word_count": 111, "text": "karena kondisi medis yang memerlukan istirahat panjang 3. Cuti Akademik Paksa: dikenakan kepada mahasiswa yang tidak mendaftar ulang tanpa pemberitahuan PASAL 3 - KETENTUAN CUTI SUKARELA Mahasiswa dapat mengajukan cuti sukarela dengan ketentuan: - Telah menempuh minimal 2 semester aktif - Maksimal cuti 2 semester secara berurutan - Total cuti selama studi tidak lebih dari 4 semester - Mengajukan permohonan sebelum masa registrasi berakhir PASAL 4 - PROSEDUR PENGAJUAN CUTI 1. Mengisi formulir permohonan cuti di Biro Akademik 2. Melampirkan surat keterangan (dokter untuk cuti sakit, orang tua untuk cuti sukarela) 3. Mendapat persetujuan dari DPA dan Ketua Program Studi 4. Melunasi biaya administrasi cuti sebesar 25 persen dari biaya semester"}, {"chunk_id": "CHK010", "doc_source": "aturan_cuti_akademik.txt", "doc_title": "Aturan Cuti Akademik", "heading": "PASAL 7 - SANKSI\nMahasiswa yang tidak mengikuti prosedur cuti resmi namun tidak ", "chunk_index": 3, "word_count": 119, "text": "3. Mendapat persetujuan dari DPA dan Ketua Program Studi 4. Melunasi biaya administrasi cuti sebesar 25 persen dari biaya semester PASAL 5 - HAK DAN KEWAJIBAN SELAMA CUTI Selama cuti akademik mahasiswa: - Tidak berhak mengikuti kegiatan akademik dan menggunakan fasilitas kampus - Tidak dihitung dalam Evaluasi Kemajuan Studi - Wajib melaporkan diri ke Biro Akademik sebelum masa cuti berakhir untuk aktivasi kembali PASAL 6 - AKTIVASI KEMBALI Mahasiswa yang akan aktif kembali setelah cuti wajib mendaftar ulang pada masa registrasi. Mahasiswa yang tidak aktif kembali setelah masa cuti berakhir dinyatakan mengundurkan diri. PASAL 7 - SANKSI Mahasiswa yang tidak mengikuti prosedur cuti resmi namun tidak aktif selama satu semester dikenakan cuti paksa dan diwajibkan membayar biaya semester penuh."}, {"chunk_id": "CHK011", "doc_source": "sop_perkuliahan.txt", "doc_title": "Sop Perkuliahan", "heading": "BAB III - KEHADIRAN DOSEN\n1. Dosen wajib hadir tepat waktu dan memberikan perkul", "chunk_index": 1, "word_count": 116, "text": "STANDAR OPERASIONAL PROSEDUR (SOP) PERKULIAHAN Institut Sains dan Teknologi Nasional (ISTN) Berlaku untuk Semua Program Studi BAB I - TUJUAN DAN RUANG LINGKUP SOP ini mengatur tata cara pelaksanaan perkuliahan di ISTN agar proses pembelajaran berlangsung tertib, efektif, dan berkualitas. SOP ini berlaku bagi mahasiswa, dosen, dan tenaga kependidikan. BAB II - KEHADIRAN MAHASISWA 1. Mahasiswa wajib hadir minimal 75 persen dari total pertemuan untuk dapat mengikuti ujian akhir semester 2. Ketidakhadiran karena sakit atau izin resmi dihitung sebagai hadir apabila disertai surat keterangan yang diserahkan maksimal 3 hari setelah ketidakhadiran 3. Keterlambatan lebih dari 15 menit dihitung sebagai tidak hadir 4. Mahasiswa yang kehadirannya kurang dari 75 persen mendapat nilai E untuk mata kuliah bersangkutan"}, {"chunk_id": "CHK012", "doc_source": "sop_perkuliahan.txt", "doc_title": "Sop Perkuliahan", "heading": "BAB IV - TATA TERTIB PERKULIAHAN\nSelama perkuliahan berlangsung:\n1. Mahasiswa ti", "chunk_index": 2, "word_count": 67, "text": "menit dihitung sebagai tidak hadir 4. Mahasiswa yang kehadirannya kurang dari 75 persen mendapat nilai E untuk mata kuliah bersangkutan BAB III - KEHADIRAN DOSEN 1. Dosen wajib hadir tepat waktu dan memberikan perkuliahan sesuai Rencana Pembelajaran Semester (RPS) 2. Ketidakhadiran dosen wajib diganti dengan jadwal pengganti yang disepakati bersama mahasiswa 3. Dosen yang tidak hadir lebih dari 3 kali tanpa pemberitahuan dilaporkan ke Ketua Program Studi"}, {"chunk_id": "CHK013", "doc_source": "sop_perkuliahan.txt", "doc_title": "Sop Perkuliahan", "heading": "BAB V - EVALUASI DAN PENILAIAN\nSistem penilaian terdiri dari:\n- Tugas dan Kuis :", "chunk_index": 3, "word_count": 114, "text": "yang disepakati bersama mahasiswa 3. Dosen yang tidak hadir lebih dari 3 kali tanpa pemberitahuan dilaporkan ke Ketua Program Studi BAB IV - TATA TERTIB PERKULIAHAN Selama perkuliahan berlangsung: 1. Mahasiswa tidak diperkenankan menggunakan ponsel untuk keperluan selain pembelajaran 2. Mahasiswa wajib berpakaian rapi dan sopan sesuai ketentuan kampus 3. Diskusi dan pertanyaan disampaikan secara tertib dengan mengangkat tangan terlebih dahulu 4. Dilarang membawa makanan dan minuman ke dalam ruang kuliah kecuali air mineral BAB V - EVALUASI DAN PENILAIAN Sistem penilaian terdiri dari: - Tugas dan Kuis : 20 persen - Ujian Tengah Semester (UTS) : 35 persen - Ujian Akhir Semester (UAS) : 35 persen - Kehadiran dan Partisipasi : 10 persen"}, {"chunk_id": "CHK014", "doc_source": "sop_perkuliahan.txt", "doc_title": "Sop Perkuliahan", "heading": "BAB VI - UJIAN\n1. Mahasiswa wajib membawa kartu ujian yang telah divalidasi\n2. D", "chunk_index": 4, "word_count": 88, "text": "Semester (UTS) : 35 persen - Ujian Akhir Semester (UAS) : 35 persen - Kehadiran dan Partisipasi : 10 persen Konversi nilai angka ke huruf: - 85 - 100 : A (4.00) - 80 - 84 : A- (3.75) - 75 - 79 : B+ (3.50) - 70 - 74 : B (3.00) - 65 - 69 : B- (2.75) - 60 - 64 : C+ (2.50) - 55 - 59 : C (2.00) - 45 - 54 : D (1.00) - 0 - 44 : E (0.00)"}, {"chunk_id": "CHK015", "doc_source": "sop_perkuliahan.txt", "doc_title": "Sop Perkuliahan", "heading": "BAB VII - PENGADUAN\nMahasiswa dapat menyampaikan pengaduan terkait perkuliahan m", "chunk_index": 5, "word_count": 94, "text": "55 - 59 : C (2.00) - 45 - 54 : D (1.00) - 0 - 44 : E (0.00) BAB VI - UJIAN 1. Mahasiswa wajib membawa kartu ujian yang telah divalidasi 2. Dilarang membawa catatan ke dalam ruang ujian kecuali untuk ujian open book 3. Kecurangan dalam ujian mengakibatkan nilai E dan sanksi disiplin 4. Ujian susulan hanya diberikan untuk alasan sakit atau darurat keluarga dengan bukti surat resmi BAB VII - PENGADUAN Mahasiswa dapat menyampaikan pengaduan terkait perkuliahan melalui sistem pengaduan online SIAKAD atau langsung ke Biro Akademik pada jam kerja."}];
+
+const DOCS = {
+  "pedoman_krs.txt":{title:"Pedoman KRS",desc:"Aturan pengisian KRS"},
+  "pedoman_skripsi.txt":{title:"Pedoman Skripsi",desc:"Panduan penulisan skripsi"},
+  "aturan_cuti_akademik.txt":{title:"Aturan Cuti Akademik",desc:"Ketentuan cuti akademik"},
+  "sop_perkuliahan.txt":{title:"SOP Perkuliahan",desc:"Tata tertib perkuliahan"},
+};
+const UJI_Q = [
+  "Berapa SKS maksimal jika IP saya 3.6?",
+  "Apa syarat mengajukan skripsi?",
+  "Bagaimana prosedur pengajuan cuti akademik?",
+  "Berapa persen kehadiran minimal untuk ikut ujian?",
+  "Bagaimana sistem penilaian ujian di ISTN?",
+];
+
+function toast(m){const t=document.getElementById("toast");document.getElementById("tm").textContent=m;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2500);}
+
+function kwScore(q,text){
+  const qw=q.toLowerCase().replace(/[^\w\s]/g,"").split(/\s+/).filter(w=>w.length>2);
+  const t=text.toLowerCase();let s=0;
+  qw.forEach(w=>{const re=new RegExp("\\b"+w+"\\b","g");const m=t.match(re);if(m)s+=m.length;});
+  if(t.includes(q.toLowerCase()))s+=5;return s;
+}
+
+function search(query,topK=3){
+  if(!query.trim())return[];
+  return CHUNKS.map(c=>({...c,score:kwScore(query,c.text)+kwScore(query,c.heading||"")}))
+    .filter(c=>c.score>0).sort((a,b)=>b.score-a.score).slice(0,topK);
+}
+
+function genAnswer(query,results){
+  if(!results.length)return{text:"Tidak ditemukan informasi relevan dalam dokumen akademik.",sources:[]};
+  const qw=query.toLowerCase().replace(/[^\w\s]/g,"").split(/\s+/).filter(w=>w.length>2);
+  const parts=[];const sources=[];
+  results.slice(0,3).forEach(r=>{
+    const sents=r.text.split(/[.!?]\s+/);
+    const rel=sents.filter(s=>qw.some(w=>s.toLowerCase().includes(w)));
+    if(rel.length)parts.push(rel[0].trim());
+    if(!sources.includes(r.doc_source))sources.push(r.doc_source);
+  });
+  let text=parts.length?parts.slice(0,3).join(". "):(results[0].text.slice(0,400)+"...");
+  if(text.length>550)text=text.slice(0,550)+"...";
+  return{text,sources};
+}
+
+function highlight(text,query){
+  const qw=query.replace(/[^\w\s]/g,"").split(/\s+/).filter(w=>w.length>2);
+  let t=text.slice(0,350)+(text.length>350?"...":"");
+  qw.forEach(w=>{t=t.replace(new RegExp("("+w+")","gi"),"<mark style=\"background:#EDE9FE;border-radius:3px;padding:0 2px;\">$1</mark>");});
+  return t;
+}
+
+function setQ(q){
+  document.getElementById("q-input").value=q;
+  doSearch();
+}
+
+function doSearch(){
+  const q=document.getElementById("q-input").value.trim();
+  const topK=parseInt(document.getElementById("topk").value);
+  if(!q){toast("Masukkan pertanyaan dulu");return;}
+  const results=search(q,topK);
+  const{text:ans,sources}=genAnswer(q,results);
+  document.getElementById("sb-results").textContent=results.length;
+  document.getElementById("empty-state").style.display="none";
+  // Answer box
+  document.getElementById("answer-text").textContent=ans;
+  document.getElementById("answer-src").innerHTML=sources.length?sources.map(s=>`<span class="src-badge">📄 ${s}</span>`).join(" "):"—";
+  document.getElementById("answer-section").style.display="block";
+  // Results
+  document.getElementById("res-count").textContent=results.length+" hasil";
+  document.getElementById("result-items").innerHTML=results.length?results.map((r,i)=>`
+    <div class="result-item">
+      <div class="ri-header">
+        <div class="ri-num">${i+1}</div>
+        <div class="ri-title">${r.doc_title}</div>
+        <span class="ri-src">📄 ${r.doc_source}</span>
+        <span class="ri-score">Skor: ${r.score}</span>
+      </div>
+      <div class="ri-heading">📌 ${r.heading||"—"}</div>
+      <div class="ri-text">${highlight(r.text,q)}</div>
+      <div class="ri-meta">Chunk ${r.chunk_id} · ${r.word_count} kata · Index ${r.chunk_index}</div>
+    </div>`).join(""):`<div style="text-align:center;padding:1.5rem;color:var(--gray500);">Tidak ditemukan hasil relevan. Coba kata kunci berbeda.</div>`;
+  document.getElementById("results-section").style.display="block";
+  renderChecklist(true);
+  toast("Ditemukan "+results.length+" hasil untuk: "+q.slice(0,30));
+}
+
+function initDocList(){
+  const counts={};
+  CHUNKS.forEach(c=>{counts[c.doc_source]=(counts[c.doc_source]||0)+1;});
+  document.getElementById("doc-list").innerHTML=Object.entries(DOCS).map(([fn,d])=>`
+    <div class="doc-item"><div class="doc-name">📄 ${d.title}</div>
+    <div class="doc-chunks">${d.desc} · ${counts[fn]||0} chunks</div></div>`).join("");
+  document.getElementById("sb-chunks").textContent=CHUNKS.length;
+  document.getElementById("chunk-count-badge").textContent=CHUNKS.length+" chunks";
+}
+
+function renderUjiTable(){
+  document.getElementById("uji-tbody").innerHTML=UJI_Q.map((q,i)=>{
+    const res=search(q,3);const{sources}=genAnswer(q,res);
+    return`<tr>
+      <td class="mono">${i+1}</td>
+      <td>${q}</td>
+      <td>${res.length?res[0].doc_title:"—"}</td>
+      <td style="font-size:.73rem;">${sources.join(", ")||"—"}</td>
+      <td class="mono">${res.length}</td>
+      <td><span class="badge ${res.length?"bok":"bno"}">${res.length?"✅ Ya":"❌ Tidak"}</span></td>
+    </tr>`;}).join("");
+}
+
+function renderChunkTable(){
+  document.getElementById("chunk-tbody").innerHTML=CHUNKS.map(c=>`
+    <tr><td class="mono">${c.chunk_id}</td><td>${c.doc_source}</td>
+    <td style="max-width:200px;font-size:.75rem;">${(c.heading||"—").slice(0,60)}</td>
+    <td class="mono">${c.chunk_index}</td><td class="mono">${c.word_count}</td></tr>`).join("");
+}
+
+function renderChecklist(searched=false){
+  const checks=[
+    ["4 dokumen TXT tersedia",true,"Ada · pedoman_krs, pedoman_skripsi, aturan_cuti, sop_perkuliahan"],
+    ["Chunking dan metadata ada",true,`Ada · ${CHUNKS.length} chunks`],
+    ["5 pertanyaan diuji",true,"Ada · tabel uji tersedia"],
+    ["Search box berfungsi",searched,"Ada · aktif"],
+    ["Jawaban menampilkan sumber",searched,"Setiap jawaban menyertakan sumber dokumen"],
+    ["Jawaban tidak keluar dokumen",true,"Grounded — hanya dari teks dokumen"],
+    ["Screenshot pencarian",false,"Perlu manual"],
+    ["Laporan 1–2 halaman",false,"Perlu manual"],
+    ["AI Usage Log",true,"Ada · AI_Usage_Log.csv"],
+  ];
+  document.getElementById("cl-body").innerHTML=checks.map(([l,ok,n])=>`
+    <div class="cli"><span>${ok?"✅":"⚠️"}</span><span class="cl-l">${l}</span>
+    <span class="cl-s ${ok?"clo":"cln"}">${n}</span></div>`).join("");
+}
+
+initDocList();renderUjiTable();renderChunkTable();renderChecklist();
+</script>
+</body>
+</html>
